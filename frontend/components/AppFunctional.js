@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
+import axios from 'axios';
 
 export default function AppFunctional(props) {
 
@@ -10,18 +11,28 @@ const coordinates = [
 
 const grid = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-const initialValues = {
-   initialMSG: '',
-   initialPos: grid[4],
-   initialMove: 0,
-   initialCoord: coordinates[4]
+
+const initialMSG = '';
+const initialPos = grid[4];
+const initialMove = 0;
+const initialCoord = coordinates[4];
+
+
+
+
+const [pos, setPos] = useState(initialPos);
+const [errorMsg, setErrorMsg] = useState(initialMSG);
+const [moved, setMoved] = useState(initialMove);
+const [coord, setCoord] = useState(initialCoord);
+
+const postData = {
+  'x': 2,
+  'y': 2,
+  'steps': 0,
+  'email': ''
 }
 
-
-const [pos, setPos] = useState(initialValues.initialPos);
-const [errorMsg, setErrorMsg] = useState(initialValues.initialMSG);
-const [moved, setMoved] = useState(initialValues.initialMove);
-const [coord, setCoord] = useState(initialValues.initialCoord)
+const[data, setData] = useState(postData)
 
 const getCoord = () =>{
   setCoord(coordinates[pos])
@@ -47,7 +58,7 @@ const topArrow = () =>{
 
 const rightArrow = () =>{
   
-  if(pos + 1 === 4 || pos + 1 === 7 || pos + 1 === 10){
+  if(pos + 1 === 4 || pos + 1 === 7 || pos + 1 === 9){
     setPos(pos)
     setErrorMsg("You can't go right")
   }
@@ -73,6 +84,8 @@ const downArrow = () =>{
     getCoord()
     }
 }
+
+
  
 
 const leftArrow = () =>{
@@ -94,9 +107,33 @@ const reset = () =>{
   setMoved(initialMove)
   setCoord(initialCoord)
 }
+
+
+
+const handleChange = (e) =>{
+ setData({...data, email: e.target.value})  
  
+  console.log(e.target.value)
+  console.log(data)
+}
 
 
+
+const handleSubmit = (event) =>{
+  event.preventDefault();
+  axios.post('http://localhost:9000/api/result', data)
+  .then(res =>{
+    console.log(res.data.message)
+    setErrorMsg(res.data.message)
+    
+  })
+  .catch(error =>{
+    setErrorMsg('Ouch: email is required')
+    console.log(error)
+  })
+
+}
+ 
 
 
  
@@ -109,11 +146,7 @@ const reset = () =>{
       <div id="grid">
         {
           grid.map((element, index)=>{
-          //  console.log(JSON.stringify(element) === JSON.stringify(pos))
-
-          // const newStyle = JSON.stringify(element) === JSON.stringify(pos) ? 'square active': 'square';
-          // setStyle(newStyle)
-         
+                 
             return (
             <div
             value={element} 
@@ -138,8 +171,8 @@ const reset = () =>{
         <button id="down" onClick={downArrow}>DOWN</button>
         <button id="reset" onClick={reset}>reset</button>
       </div>
-      <form>
-        <input id="email" type="email" placeholder="type email"></input>
+      <form onSubmit={handleSubmit}>
+        <input id="email" value={data.email} type="email" placeholder="type email" onChange={handleChange}></input>
         <input id="submit" type="submit"></input>
       </form>
     </div>
@@ -147,12 +180,3 @@ const reset = () =>{
 }
 
 
-  {/* <div className="square"></div>
-        <div className="square"></div>
-        <div className="square"></div>
-        <div className="square"></div>
-        <div className="square active">B</div>
-        <div className="square"></div>
-        <div className="square"></div>
-        <div className="square"></div>
-        <div className="square"></div> */}
