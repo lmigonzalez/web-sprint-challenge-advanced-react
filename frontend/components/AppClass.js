@@ -37,6 +37,14 @@ export default class AppClass extends React.Component {
   }
 
 
+  // getCoord = (position) =>{
+  //   // setCoord(coordinates[position])
+  //   this.setState({
+
+  //   })
+  // }
+
+
   topArrow = () =>{
   
     if(this.state.initialPos - 3 <= 0){
@@ -51,13 +59,15 @@ export default class AppClass extends React.Component {
     this.setState({
       initialMSG: '',
       initialPos: this.state.initialPos - 3,
-      initialCoord: coordinates[this.state.initialPos],
+      initialCoord: coordinates[this.state.initialPos - 4],
       initialMove: this.state.initialMove + 1
     })
-   
     }
+
+  
   }
 
+  
 
   rightArrow = () =>{
   
@@ -92,7 +102,7 @@ export default class AppClass extends React.Component {
     this.setState({
       initialMSG: '',
       initialPos: this.state.initialPos + 3,
-      initialCoord: coordinates[this.state.initialPos],
+      initialCoord: coordinates[this.state.initialPos + 2],
       initialMove: this.state.initialMove + 1
   })
    
@@ -113,7 +123,7 @@ export default class AppClass extends React.Component {
     this.setState({
       initialMSG: '',
       initialPos: this.state.initialPos - 1,
-      initialCoord: coordinates[this.state.initialPos],
+      initialCoord: coordinates[this.state.initialPos - 2],
       initialMove: this.state.initialMove + 1
   })
    
@@ -128,27 +138,27 @@ export default class AppClass extends React.Component {
     initialMSG: '',
     initialPos: grid[4],
     initialMove: 0,
-    initialCoord: coordinates[4],
-    initialMove: 0
-
+    initialCoord: coordinates[4]
   })
   }
 
   handleChange = (e) => {
   this.setState(
     prev => ({
-      ...prev, postData: {...prev.postData, email: e.target.value}
+      ...prev, postData: {...prev.postData, email: e.target.value, steps: this.state.initialMove, x: parseInt(this.state.initialCoord[0].split('')[0]), y: parseInt(this.state.initialCoord[0].split('')[this.state.initialCoord[0].length - 1])}
     })
   )
-  console.log(this.state.postData)
+ 
   }
+
+ 
 
 
   handleSubmit = (event) =>{
   event.preventDefault();
   axios.post('http://localhost:9000/api/result', this.state.postData)
   .then(res =>{
-    console.log(res.data)
+  
     this.setState({
       ...this.state, initialMSG: res.data.message
       
@@ -157,15 +167,25 @@ export default class AppClass extends React.Component {
     
   })
   .catch(error =>{
-    // setErrorMsg('Ouch: email is required')
-    // console.log(error)
+  
+   
+    // this.setState(
+      
+    //     {...this.state.postData, email: 'hello'}
+    // )
+
     console.log(error)
-    this.setState({
-      
-      ...this.state, initialMSG: 'Ouch: email is required'
-      
-    })
+
+
   })
+
+  this.setState({
+    initialPos: grid[4],
+    initialMove: 0,
+    initialCoord: coordinates[4],
+    ...this.state.postData, email: ''
+  })
+
 }
 
 
@@ -178,7 +198,7 @@ export default class AppClass extends React.Component {
         <div className="info">
           <h3 id="coordinates">Coordinates ({this.state.initialCoord})</h3>
         
-          <h3 id="steps">You moved {this.state.initialMove} times</h3>
+          <h3 id="steps">You moved {this.state.initialMove} {this.state.initialMove === 1? 'time': 'times'}</h3>
         </div>
       
         <div id="grid">

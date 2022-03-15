@@ -24,7 +24,6 @@ const [pos, setPos] = useState(initialPos);
 const [errorMsg, setErrorMsg] = useState(initialMSG);
 const [moved, setMoved] = useState(initialMove);
 const [coord, setCoord] = useState(initialCoord);
-
 const postData = {
   'x': 2,
   'y': 2,
@@ -34,8 +33,8 @@ const postData = {
 
 const[data, setData] = useState(postData)
 
-const getCoord = () =>{
-  setCoord(coordinates[pos])
+const getCoord = (position) =>{
+  setCoord(coordinates[position])
 }
 
 const whenMoved = () =>{
@@ -52,13 +51,13 @@ const topArrow = () =>{
     setPos(pos - 3)
     setErrorMsg(initialMSG)
     whenMoved()
-    getCoord()
+    getCoord(pos - 4)
     }
 }
 
 const rightArrow = () =>{
   
-  if(pos + 1 === 4 || pos + 1 === 7 || pos + 1 === 9){
+  if(pos + 1 === 4 || pos + 1 === 7 || pos + 1 > 9){
     setPos(pos)
     setErrorMsg("You can't go right")
   }
@@ -66,7 +65,7 @@ const rightArrow = () =>{
     setPos(pos + 1)
     setErrorMsg(initialMSG)
     whenMoved()
-    getCoord()
+    getCoord(pos)
     }
 }
 
@@ -81,7 +80,7 @@ const downArrow = () =>{
     setPos(pos + 3)
     setErrorMsg(initialMSG)
     whenMoved()
-    getCoord()
+    getCoord(pos + 2)
     }
 }
 
@@ -98,7 +97,7 @@ const leftArrow = () =>{
     setPos(pos - 1)
     setErrorMsg(initialMSG)
     whenMoved()
-    getCoord()
+    getCoord(pos - 2)
     }
 }
 
@@ -106,15 +105,16 @@ const reset = () =>{
   setPos(initialPos)
   setMoved(initialMove)
   setCoord(initialCoord)
+  setErrorMsg(initialMSG)
 }
 
 
 
 const handleChange = (e) =>{
- setData({...data, email: e.target.value})  
+ setData({...data, email: e.target.value, steps: moved, x: parseInt(coord[0].split('')[0]), y: parseInt(coord[0].split('')[coord[0].length - 1]) })  
  
-  console.log(e.target.value)
-  console.log(data)
+  
+
 }
 
 
@@ -123,14 +123,21 @@ const handleSubmit = (event) =>{
   event.preventDefault();
   axios.post('http://localhost:9000/api/result', data)
   .then(res =>{
-    console.log(res.data.message)
+    
     setErrorMsg(res.data.message)
     
   })
   .catch(error =>{
-    setErrorMsg('Ouch: email is required')
-    console.log(error)
+    setErrorMsg(data.email=== '' ?  'Ouch: email is required': 'Ouch: email must be a valid email')
+  
+ 
   })
+
+  setPos(initialPos)
+  setMoved(initialMove)
+  setCoord(initialCoord)
+  setData({...data, email: ''})
+ 
 
 }
  
@@ -141,7 +148,7 @@ const handleSubmit = (event) =>{
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">Coordinates ({coord})</h3>
-        <h3 id="steps">You moved {moved} times</h3>
+        <h3 id="steps">You moved {moved} {moved ===1? 'time': 'times'}</h3>
       </div>
       <div id="grid">
         {
@@ -162,7 +169,7 @@ const handleSubmit = (event) =>{
         }
       </div>
       <div className="info">
-        <h3 id="message">{errorMsg}</h3>
+        <h3 id="message">{ errorMsg }</h3>
       </div>
       <div id="keypad">
         <button id="left" onClick={leftArrow}>LEFT</button>
