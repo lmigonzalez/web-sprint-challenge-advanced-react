@@ -106,6 +106,9 @@ const reset = () =>{
   setMoved(initialMove)
   setCoord(initialCoord)
   setErrorMsg(initialMSG)
+  setData({email: ''})
+  // setData({...data, email: ''})
+
 }
 
 
@@ -117,7 +120,19 @@ const handleChange = (e) =>{
 
 }
 
-
+// const validateEmail = (email) =>{
+//   if(email === ''){
+//       setErrorMsg('Ouch: email is required')
+//   }
+//   else if(email === 'foo@bar.baz'){
+    
+//      setErrorMsg('foo@bar.baz failure #71') 
+   
+//   }
+//   else(
+//     setErrorMsg('Ouch: email must be a valid email') 
+//   )
+//  }
 
 const handleSubmit = (event) =>{
   event.preventDefault();
@@ -125,17 +140,15 @@ const handleSubmit = (event) =>{
   .then(res =>{
     
     setErrorMsg(res.data.message)
+   
     
   })
   .catch(error =>{
-    setErrorMsg(data.email=== '' ?  'Ouch: email is required': 'Ouch: email must be a valid email')
-  
+    setErrorMsg(error.response.data.message)
  
   })
 
-  setPos(initialPos)
-  setMoved(initialMove)
-  setCoord(initialCoord)
+  // setPos(initialPos) 
   setData({...data, email: ''})
  
 

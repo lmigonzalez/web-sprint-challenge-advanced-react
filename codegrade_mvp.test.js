@@ -441,6 +441,7 @@ test('AppClass is a class-based component', () => {
         fireEvent.click(right)
         fireEvent.change(email, { target: { value: 'lady@gaga.com' } })
         fireEvent.click(submit)
+        // screen.debug()
         await screen.findByText('lady win #49', queryOptions, waitForOptions)
         expect(coordinates.textContent).toMatch(/\(3.*1\)$/)
         expect(steps.textContent).toBe('You moved 2 times')

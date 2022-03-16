@@ -131,6 +131,10 @@ export default class AppClass extends React.Component {
 
   }
 
+  resetEmail = () =>{
+    this.setState({postData: {...this.state.postData, email: ''}});
+  
+  }
 
 
   reset = () => {
@@ -138,55 +142,78 @@ export default class AppClass extends React.Component {
     initialMSG: '',
     initialPos: grid[4],
     initialMove: 0,
-    initialCoord: coordinates[4]
+    initialCoord: coordinates[4],
+    postData: {email: ''}
+    // postData: {...this.state.postData, email: ''}
   })
+  
   }
+
+
 
   handleChange = (e) => {
-  this.setState(
-    prev => ({
-      ...prev, postData: {...prev.postData, email: e.target.value, steps: this.state.initialMove, x: parseInt(this.state.initialCoord[0].split('')[0]), y: parseInt(this.state.initialCoord[0].split('')[this.state.initialCoord[0].length - 1])}
+    
+  this.setState({
+      ...this.state, postData: {...this.state.postData, email: e.target.value, steps: this.state.initialMove, x: parseInt(this.state.initialCoord[0].split('')[0]), y: parseInt(this.state.initialCoord[0].split('')[this.state.initialCoord[0].length - 1])}
     })
-  )
+  
  
   }
 
- 
+//  validateEmail = (email) =>{
+//   if(email === ''){
+//     this.setState({
+//       ...this.state, initialMSG: 'Ouch: email is required'
+//     })
+//   }
+//   // else if(email === 'foo@bar.baz'){
+//   //   this.setState({
+//   //     ...this.state, initialMSG: 'foo@bar.baz failure #71'
+//   //   })
+//   // }
+//   else{
+//     this.setState({
+//       ...this.state, initialMSG: 'Ouch: email must be a valid email'
+//     })
+//   }
+//  }
 
 
   handleSubmit = (event) =>{
   event.preventDefault();
+  // console.log(this.state)
   axios.post('http://localhost:9000/api/result', this.state.postData)
   .then(res =>{
   
     this.setState({
-      ...this.state, initialMSG: res.data.message
+      ...this.state, initialMSG: res.data.message,
+      postData: {...this.state.postData, email: ''}
       
     })
     
     
   })
   .catch(error =>{
+
   
-   
-    // this.setState(
+    this.setState({
+      ...this.state, initialMSG: error.response.data.message,
       
-    //     {...this.state.postData, email: 'hello'}
-    // )
+      postData: {...this.state.postData, email: ''}
+      
+    })
 
-    console.log(error)
+ })
 
 
-  })
-
-  this.setState({
-    initialPos: grid[4],
-    initialMove: 0,
-    initialCoord: coordinates[4],
-    ...this.state.postData, email: ''
-  })
-
-}
+  // this.setState({
+  //   initialPos: grid[4],
+  //   initialMove: 0,
+  //   initialCoord: coordinates[4],
+  
+  // })
+  }
+ 
 
 
 
@@ -229,7 +256,7 @@ export default class AppClass extends React.Component {
           <button id="reset" onClick={this.reset}>reset</button>
         </div>
         <form onSubmit={this.handleSubmit}>
-          <input id="email" type="email" placeholder="type email" onChange={this.handleChange}></input>
+          <input id="email" type="email" value={this.state.postData.email} placeholder="type email" onChange={this.handleChange}></input>
           <input id="submit" type="submit" ></input>
         </form>
       </div>
